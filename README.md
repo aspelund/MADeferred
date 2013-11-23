@@ -24,3 +24,6 @@ dfd.resolve();
 The first then function is called whed dfd.resolve is called. But as the inner function returns a promise, the then chain will pause and wait for the innerDfd to be resolved.
 
 
+Examples
+========
+Have a look at the MADeferredTest.html file for usage example.
