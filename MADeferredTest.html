@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MADeferred test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="MADeferred.js"></script>
+<script src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+<script>
+
+    /**
+     * Tests that the first then is executed after the first resolve
+     * */
+    test("MADeferred resolve", function(){
+       var a = 1;
+       var dfd = new MADeferred();
+       var promise = dfd.promise();
+       promise.then(function(){
+           a *= 2;
+       })
+        equal(a,1);
+        dfd.resolve();
+        equal(a,2);
+    });
+
+    /**
+     * Tests that resolve parameters are passed into the then callback
+     * */
+    test("MADeferred resolve with single parameter", function(){
+        var a = 1;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.then(function(val){
+            a = val;
+        })
+        equal(a,1);
+        dfd.resolve(3);
+        equal(a,3);
+    });
+
+    /**
+     * Tests with multiple then
+     * */
+    test("MADeferred resolve with multiple then", function(){
+        var a = 1;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.then(function(val){
+            a = val;
+        });
+        promise.then(function(){
+           a*=2;
+        });
+        equal(a,1);
+        dfd.resolve(3);
+        equal(a,6);
+    });
+
+    /**
+     * Test that then are fired if the deferred object is already resolved
+     * */
+    test("MADeferred then callback for resolved object", function(){
+        var a = 1;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        dfd.resolve(3);
+        promise.then(function(val){
+            a = val;
+        });
+        promise.then(function(){
+            a*=2;
+        });
+        equal(a,6);
+    });
+
+
+    /**
+     * Tests with multiple then and inner deferred objects
+     * */
+    test("MADeferred resolve with multiple then and inner then", function(){
+        var a = 1;
+        var dfd = new MADeferred();
+
+        var dfd2 = new MADeferred(); // Used for inner promise
+        var promise = dfd.promise();
+        promise.then(function(){
+            a*=2;
+            var promise = dfd2.promise();
+            // This shouldn't be executed due to the resolve handles only the outer one.
+            promise.then(function(){
+               a*=2;
+            });
+            return promise;
+        })
+                .then(function(){
+                   a*=2;
+                });
+        dfd.resolve(3);
+        equal(a,2);
+
+        dfd2.resolve(2);
+        equal(a,8);
+    });
+
+    /**
+     * Tests that resolve parameters are passed into the then callback
+     * */
+    test("MADeferred resolve with multiple parameters", function(){
+        var a = 1;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.then(function(b, c, d){
+            a = b*c*d;
+        })
+        equal(a,1);
+        dfd.resolve(2,3,4);
+        equal(a,24);
+    });
+
+    /**
+     * Tests that fail is executed on reject
+     * */
+    test("MADeferred reject", function(){
+        var a;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.fail(function(){
+            a = 2;
+        });
+        dfd.reject();
+        equal(a,2);
+    });
+
+    /**
+     * Tests that fail callbacks are made if the deferred object
+     * is already rejected
+     * */
+    test("MADeferred fail for already rejected object", function(){
+        var a;
+        var dfd = new MADeferred();
+        dfd.reject();
+        var promise = dfd.promise();
+        promise.fail(function(){
+            a = 2;
+        });
+        equal(a,2);
+    });
+
+    /**
+     * Tests that fail is executed on reject and
+     * that the reject variable is passed on
+     * */
+    test("MADeferred reject with multiple parameters", function(){
+        var a;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.fail(function(b,c){
+            a = b*c;
+        });
+        dfd.reject(3,4);
+        equal(a,12);
+    });
+
+    /**
+     * Test of multiple fail callbacks
+     * */
+    test('MADeferred multiple fail callbacks', function(){
+        var a=1;
+        var dfd = new MADeferred();
+        var promise = dfd.promise();
+        promise.fail(function(){a*=2;}).fail(function(){a*=3;});
+        dfd.reject();
+        equal(a,6);
+    });
+
+</script>
+</body>
+</html>
