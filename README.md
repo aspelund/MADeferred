@@ -3,6 +3,13 @@ MADeferred
 
 Simpe Defer/Promise library for javascript. The purpose of this little library is to make nested Deferred objects / promise functionality easy.
 
+Documentation
+=============
+A jsdoc from the files are found at http://htmlpreview.github.io/?https://raw.github.com/aspelund/MADeferred/master/docs/index.html
+
+Examples
+========
+
 For example:
 ```javascript
 var dfd = new MADeferred();
@@ -24,8 +31,6 @@ dfd.resolve();
 The first then function is called whed dfd.resolve is called. But as the inner function returns a promise, the then chain will pause and wait for the innerDfd to be resolved.
 
 
-Examples
-========
 Have a look at the MADeferredTest.html file for usage example.
 Basic usage:
 ```javascript
