@@ -13,7 +13,7 @@ promise.then(function(){
   setTimeout(function(){
     innerDfd.resolve();
   }, 3000);
-  innerDfd.promise();
+  return innerDfd.promise();
 })
   .then(function(){
     // some other code
